@@ -116,16 +116,6 @@ const PublicReportForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Admin Access Button */}
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={() => window.location.href = '/admin'}
-          className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1 rounded-md hover:bg-white/50 transition-colors duration-200"
-        >
-          Admin
-        </button>
-      </div>
-
       {/* Form */}
       <div className="max-w-md mx-auto p-4 pb-8">
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-6 mt-6 space-y-6">
