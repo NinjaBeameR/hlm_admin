@@ -8,7 +8,7 @@ export interface BugReport {
   title: string;
   description: string;
   severity: string;
-  status: string;
+  status: 'new' | 'investigating' | 'in_progress' | 'resolved' | 'fixed' | 'spam' | 'closed';
   created_at: string;
 }
 

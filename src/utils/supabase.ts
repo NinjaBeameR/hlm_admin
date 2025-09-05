@@ -87,3 +87,82 @@ export const fetchSuggestions = async (): Promise<{ data: Suggestion[] | null; e
     };
   }
 };
+
+// Bug Report Actions
+export const updateBugReportStatus = async (id: string, status: BugReport['status']): Promise<{ error: DatabaseError | null }> => {
+  try {
+    const { error } = await supabase
+      .from('bug_reports')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) {
+      return { 
+        error: { 
+          message: `Failed to update bug report status to ${status}`, 
+          code: error.code 
+        } 
+      };
+    }
+
+    return { error: null };
+  } catch (err) {
+    return { 
+      error: { 
+        message: 'Network error while updating bug report' 
+      } 
+    };
+  }
+};
+
+export const deleteBugReport = async (id: string): Promise<{ error: DatabaseError | null }> => {
+  try {
+    const { error } = await supabase
+      .from('bug_reports')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      return { 
+        error: { 
+          message: 'Failed to delete bug report', 
+          code: error.code 
+        } 
+      };
+    }
+
+    return { error: null };
+  } catch (err) {
+    return { 
+      error: { 
+        message: 'Network error while deleting bug report' 
+      } 
+    };
+  }
+};
+
+export const deleteSuggestion = async (id: string): Promise<{ error: DatabaseError | null }> => {
+  try {
+    const { error } = await supabase
+      .from('suggestions')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      return { 
+        error: { 
+          message: 'Failed to delete suggestion', 
+          code: error.code 
+        } 
+      };
+    }
+
+    return { error: null };
+  } catch (err) {
+    return { 
+      error: { 
+        message: 'Network error while deleting suggestion' 
+      } 
+    };
+  }
+};

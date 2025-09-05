@@ -4,11 +4,22 @@ import DataTable from '../components/DataTable';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
+import SuggestionActionButtons from '../components/SuggestionActionButtons';
 import { useSuggestions } from '../hooks/useSuggestions';
+import { deleteSuggestion } from '../utils/supabase';
 import type { Suggestion } from '../types';
 
 const SuggestionsPage: React.FC = () => {
   const { data, loading, error, refetch } = useSuggestions();
+
+  const handleDelete = async (id: string) => {
+    const result = await deleteSuggestion(id);
+    if (result.error) {
+      alert(`Error: ${result.error.message}`);
+    } else {
+      await refetch();
+    }
+  };
 
   const columns = [
     {
@@ -27,6 +38,17 @@ const SuggestionsPage: React.FC = () => {
       key: 'created_at' as keyof Suggestion,
       label: 'Date Created',
       sortable: true,
+    },
+    {
+      key: 'actions' as keyof Suggestion,
+      label: 'Actions',
+      sortable: false,
+      render: (_: any, item: Suggestion) => (
+        <SuggestionActionButtons
+          id={item.id}
+          onDelete={handleDelete}
+        />
+      ),
     },
   ];
 
