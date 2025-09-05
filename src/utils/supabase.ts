@@ -132,7 +132,7 @@ export const fetchBugReports = async (): Promise<{ data: BugReport[] | null; err
   try {
     const { data, error } = await supabase
       .from('bug_reports')
-      .select('id, description, app_version, screenshot_url, created_at, status')
+      .select('id, title, description, severity, status, app_version, screenshot_url, created_at')
       .order('created_at', { ascending: false });
 
     if (error) {
