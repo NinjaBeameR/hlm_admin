@@ -13,14 +13,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <LoadingSpinner size="lg" text="Loading..." />
       </div>
     );
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/admin" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Bug, Filter, CheckCircle2, AlertTriangle, Archive } from 'lucide-react';
+import { Bug, CheckCircle2, AlertTriangle, Archive } from 'lucide-react';
 import DataTable from '../components/DataTable';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -19,7 +19,7 @@ const BugReportsPage: React.FC = () => {
   const filteredData = useMemo(() => {
     switch (filter) {
       case 'active':
-        return data.filter(item => !['fixed', 'spam'].includes(item.status));
+        return data.filter(item => !['fixed', 'spam'].includes(item.status || 'new'));
       case 'fixed':
         return data.filter(item => item.status === 'fixed');
       case 'spam':
@@ -73,34 +73,40 @@ const BugReportsPage: React.FC = () => {
       key: 'severity' as keyof BugReport,
       label: 'Severity',
       sortable: true,
-      render: (value: string) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          value === 'critical' ? 'bg-red-100 text-red-800' :
-          value === 'high' ? 'bg-orange-100 text-orange-800' :
-          value === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-          'bg-green-100 text-green-800'
-        }`}>
-          {value.charAt(0).toUpperCase() + value.slice(1)}
-        </span>
-      ),
+      render: (value: string | undefined) => {
+        const severity = value || 'low';
+        return (
+          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            severity === 'critical' ? 'bg-red-100 text-red-800' :
+            severity === 'high' ? 'bg-orange-100 text-orange-800' :
+            severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+            'bg-green-100 text-green-800'
+          }`}>
+            {severity.charAt(0).toUpperCase() + severity.slice(1)}
+          </span>
+        );
+      },
     },
     {
       key: 'status' as keyof BugReport,
       label: 'Status',
       sortable: true,
-      render: (value: string) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          value === 'new' ? 'bg-blue-100 text-blue-800' :
-          value === 'investigating' ? 'bg-purple-100 text-purple-800' :
-          value === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-          value === 'resolved' ? 'bg-green-100 text-green-800' :
-          value === 'fixed' ? 'bg-emerald-100 text-emerald-800' :
-          value === 'spam' ? 'bg-red-100 text-red-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {value.replace('_', ' ').charAt(0).toUpperCase() + value.replace('_', ' ').slice(1)}
-        </span>
-      ),
+      render: (value: string | undefined) => {
+        const status = value || 'new';
+        return (
+          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            status === 'new' ? 'bg-blue-100 text-blue-800' :
+            status === 'investigating' ? 'bg-purple-100 text-purple-800' :
+            status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+            status === 'resolved' ? 'bg-green-100 text-green-800' :
+            status === 'fixed' ? 'bg-emerald-100 text-emerald-800' :
+            status === 'spam' ? 'bg-red-100 text-red-800' :
+            'bg-gray-100 text-gray-800'
+          }`}>
+            {status.replace('_', ' ').charAt(0).toUpperCase() + status.replace('_', ' ').slice(1)}
+          </span>
+        );
+      },
     },
     {
       key: 'created_at' as keyof BugReport,
@@ -114,7 +120,7 @@ const BugReportsPage: React.FC = () => {
       render: (_: any, item: BugReport) => (
         <ActionButtons
           id={item.id}
-          status={item.status}
+          status={item.status || 'new'}
           onMarkFixed={handleMarkFixed}
           onMarkSpam={handleMarkSpam}
           onDelete={handleDelete}
@@ -124,7 +130,7 @@ const BugReportsPage: React.FC = () => {
   ];
 
   const filterOptions = [
-    { value: 'active' as FilterType, label: 'Active', icon: Bug, count: data.filter(item => !['fixed', 'spam'].includes(item.status)).length },
+    { value: 'active' as FilterType, label: 'Active', icon: Bug, count: data.filter(item => !['fixed', 'spam'].includes(item.status || 'new')).length },
     { value: 'fixed' as FilterType, label: 'Fixed', icon: CheckCircle2, count: data.filter(item => item.status === 'fixed').length },
     { value: 'spam' as FilterType, label: 'Spam', icon: AlertTriangle, count: data.filter(item => item.status === 'spam').length },
     { value: 'all' as FilterType, label: 'All', icon: Archive, count: data.length },

@@ -1,32 +1,34 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Navigation from './components/Navigation';
-import LoginPage from './pages/LoginPage';
-import BugReportsPage from './pages/BugReportsPage';
-import SuggestionsPage from './pages/SuggestionsPage';
+import PublicReportForm from './components/PublicReportForm';
+import AdminLoginPage from './pages/AdminLoginPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
+            {/* Public Route - Report Form */}
+            <Route path="/" element={<PublicReportForm />} />
+            
+            {/* Admin Login */}
+            <Route path="/admin" element={<AdminLoginPage />} />
+            
+            {/* Protected Admin Dashboard */}
             <Route
-              path="/*"
+              path="/admin/dashboard"
               element={
                 <ProtectedRoute>
-                  <Navigation />
-                  <Routes>
-                    <Route path="/" element={<Navigate to="/bug-reports" replace />} />
-                    <Route path="/bug-reports" element={<BugReportsPage />} />
-                    <Route path="/suggestions" element={<SuggestionsPage />} />
-                  </Routes>
+                  <AdminDashboard />
                 </ProtectedRoute>
               }
             />
+            
+            {/* Redirect any unknown routes to home */}
+            <Route path="*" element={<PublicReportForm />} />
           </Routes>
         </div>
       </Router>
