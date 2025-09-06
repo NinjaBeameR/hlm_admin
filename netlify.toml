@@ -2,13 +2,6 @@
   command = "npm run build"
   publish = "dist"
 
-# OTA update bundles - serve static files from /ota folder
-[[redirects]]
-  from = "/ota/*"
-  to = "/ota/:splat"
-  status = 200
-
-# SPA fallback - must come after /ota/* rule
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -14,40 +14,16 @@ Ensure these are set in Netlify:
    - Run the complete_database_setup.sql in Supabase SQL Editor
    - Verify tables are created correctly
 
-3. **Deploy Admin + OTA Updates**
-   - Build everything: `npm run build`
-   - This will:
-     - Build the admin site to `build/` then move to `dist/`
-     - Generate OTA bundles to `dist/ota/`
-   - Commit and push: `git add . && git commit -m "Update" && git push origin main`
-   - Netlify automatically deploys from the `dist/` folder
+3. **Deploy**
+   - Commit any changes: `git add . && git commit -m "Update"`
+   - Push to GitHub: `git push origin main`
+   - Netlify automatically builds and deploys
 
 4. **Test Production**
    - Visit https://hlmadmin.netlify.app
    - Check browser console for errors
    - Test form submission
    - Test admin login
-   - Test OTA file access: https://hlmadmin.netlify.app/ota/
-
-## Build Process
-
-The new unified build process:
-```bash
-npm run build          # Builds both admin + OTA
-npm run build:web      # Admin only
-npm run build:ota      # OTA only
-```
-
-Final structure in `dist/`:
-```
-dist/
-├── index.html         # Admin site
-├── assets/           # Admin assets
-└── ota/             # React Native OTA bundles
-    ├── bundles/
-    ├── assets/
-    └── metadata.json
-```
 
 ## Quick Debug Commands
 

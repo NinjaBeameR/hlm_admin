@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:web && npm run build:ota",
-    "build:web": "vite build --outDir build && node scripts/move-to-dist.js",
-    "build:ota": "expo export --output-dir dist/ota --platform all",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
