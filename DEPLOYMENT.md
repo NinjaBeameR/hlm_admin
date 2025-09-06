@@ -3,11 +3,6 @@
 ## Environment Variables Check
 Ensure these are set in Netlify:
 
-```
-VITE_SUPABASE_URL=https://kvzhuiwqrvckfaweikhq.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2emh1aXdxcnZja2Zhd2Vpa2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNzExMzMsImV4cCI6MjA3MjY0NzEzM30.v2bWSKIAuHq4fSpaM4f7EXclefcoeWLFzOvAoJtzAbI
-```
-
 ## Deployment Steps
 
 1. **Check Environment Variables**
@@ -19,15 +14,40 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
    - Run the complete_database_setup.sql in Supabase SQL Editor
    - Verify tables are created correctly
 
-3. **Deploy**
-   - Trigger new deployment in Netlify
-   - Check build logs for any environment variable issues
+3. **Deploy Admin + OTA Updates**
+   - Build everything: `npm run build`
+   - This will:
+     - Build the admin site to `build/` then move to `dist/`
+     - Generate OTA bundles to `dist/ota/`
+   - Commit and push: `git add . && git commit -m "Update" && git push origin main`
+   - Netlify automatically deploys from the `dist/` folder
 
 4. **Test Production**
    - Visit https://hlmadmin.netlify.app
    - Check browser console for errors
    - Test form submission
    - Test admin login
+   - Test OTA file access: https://hlmadmin.netlify.app/ota/
+
+## Build Process
+
+The new unified build process:
+```bash
+npm run build          # Builds both admin + OTA
+npm run build:web      # Admin only
+npm run build:ota      # OTA only
+```
+
+Final structure in `dist/`:
+```
+dist/
+├── index.html         # Admin site
+├── assets/           # Admin assets
+└── ota/             # React Native OTA bundles
+    ├── bundles/
+    ├── assets/
+    └── metadata.json
+```
 
 ## Quick Debug Commands
 
