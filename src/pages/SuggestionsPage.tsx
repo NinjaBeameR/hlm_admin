@@ -6,7 +6,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
 import SuggestionActionButtons from '../components/SuggestionActionButtons';
 import { useSuggestions } from '../hooks/useSuggestions';
-import { deleteSuggestion } from '../utils/supabase';
+import { deleteSuggestion, updateSuggestionStatus } from '../utils/supabase';
 import type { Suggestion } from '../types';
 
 const SuggestionsPage: React.FC = () => {
@@ -14,6 +14,24 @@ const SuggestionsPage: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     const result = await deleteSuggestion(id);
+    if (result.error) {
+      alert(`Error: ${result.error.message}`);
+    } else {
+      await refetch();
+    }
+  };
+
+  const handleMarkRead = async (id: string) => {
+    const result = await updateSuggestionStatus(id, 'read');
+    if (result.error) {
+      alert(`Error: ${result.error.message}`);
+    } else {
+      await refetch();
+    }
+  };
+
+  const handleMarkPending = async (id: string) => {
+    const result = await updateSuggestionStatus(id, 'pending');
     if (result.error) {
       alert(`Error: ${result.error.message}`);
     } else {
@@ -35,6 +53,24 @@ const SuggestionsPage: React.FC = () => {
       ),
     },
     {
+      key: 'status' as keyof Suggestion,
+      label: 'Status',
+      sortable: true,
+      render: (value: string | undefined) => {
+        const status = value || 'new';
+        return (
+          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            status === 'new' ? 'bg-blue-100 text-blue-800' :
+            status === 'read' ? 'bg-indigo-100 text-indigo-800' :
+            status === 'pending' ? 'bg-yellow-200 text-yellow-900' :
+            'bg-gray-100 text-gray-800'
+          }`}>
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </span>
+        );
+      },
+    },
+    {
       key: 'created_at' as keyof Suggestion,
       label: 'Date Created',
       sortable: true,
@@ -46,6 +82,9 @@ const SuggestionsPage: React.FC = () => {
       render: (_: any, item: Suggestion) => (
         <SuggestionActionButtons
           id={item.id}
+          status={item.status || 'new'}
+          onMarkRead={handleMarkRead}
+          onMarkPending={handleMarkPending}
           onDelete={handleDelete}
         />
       ),

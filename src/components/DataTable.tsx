@@ -112,21 +112,31 @@ const DataTable = <T extends TableData>({ data, columns, emptyMessage = 'No data
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {sortedData.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50 transition-colors duration-150">
-                {columns.map((column) => (
-                  <td key={String(column.key)} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {column.render
-                      ? column.render(column.key === 'actions' ? null : item[column.key as keyof T], item)
-                      : column.key === 'actions'
-                      ? null
-                      : column.key === 'created_at'
-                      ? formatDate(item[column.key as keyof T] as string)
-                      : String(item[column.key as keyof T])}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {sortedData.map((item) => {
+              const isPending = (item as any).status === 'pending';
+              return (
+                <tr 
+                  key={item.id} 
+                  className={`transition-colors duration-150 ${
+                    isPending 
+                      ? 'bg-yellow-50 hover:bg-yellow-100' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  {columns.map((column) => (
+                    <td key={String(column.key)} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {column.render
+                        ? column.render(column.key === 'actions' ? null : item[column.key as keyof T], item)
+                        : column.key === 'actions'
+                        ? null
+                        : column.key === 'created_at'
+                        ? formatDate(item[column.key as keyof T] as string)
+                        : String(item[column.key as keyof T])}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

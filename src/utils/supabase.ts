@@ -262,3 +262,30 @@ export const deleteSuggestion = async (id: string): Promise<{ error: DatabaseErr
     };
   }
 };
+
+// Update suggestion status
+export const updateSuggestionStatus = async (id: string, status: 'new' | 'read' | 'pending'): Promise<{ error: DatabaseError | null }> => {
+  try {
+    const { error } = await supabase
+      .from('suggestions')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) {
+      return { 
+        error: { 
+          message: 'Failed to update suggestion status', 
+          code: error.code 
+        } 
+      };
+    }
+
+    return { error: null };
+  } catch {
+    return { 
+      error: { 
+        message: 'Network error while updating suggestion status' 
+      } 
+    };
+  }
+};

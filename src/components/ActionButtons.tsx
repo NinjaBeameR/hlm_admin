@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Check, AlertTriangle, Trash2, Loader2 } from 'lucide-react';
+import { Check, AlertTriangle, Trash2, Loader2, Eye, Clock } from 'lucide-react';
 
 interface ActionButtonsProps {
   id: string;
   status: string;
   onMarkFixed: (id: string) => Promise<void>;
   onMarkSpam: (id: string) => Promise<void>;
+  onMarkRead: (id: string) => Promise<void>;
+  onMarkPending: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
 
@@ -14,6 +16,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   status,
   onMarkFixed,
   onMarkSpam,
+  onMarkRead,
+  onMarkPending,
   onDelete,
 }) => {
   const [loading, setLoading] = useState<string | null>(null);
@@ -35,6 +39,40 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
   return (
     <div className="flex space-x-2">
+      {/* Mark as Read Button */}
+      {status !== 'read' && status !== 'fixed' && status !== 'spam' && (
+        <button
+          onClick={() => handleAction('read', onMarkRead)}
+          disabled={loading !== null}
+          className="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          title="Mark as Read"
+        >
+          {loading === 'read' ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : (
+            <Eye className="w-3 h-3" />
+          )}
+          <span className="ml-1 hidden sm:inline">Read</span>
+        </button>
+      )}
+
+      {/* Mark as Pending Button */}
+      {status !== 'pending' && status !== 'fixed' && status !== 'spam' && (
+        <button
+          onClick={() => handleAction('pending', onMarkPending)}
+          disabled={loading !== null}
+          className="inline-flex items-center px-3 py-1 text-xs font-medium text-yellow-700 bg-yellow-100 rounded-full hover:bg-yellow-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          title="Mark as Pending"
+        >
+          {loading === 'pending' ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : (
+            <Clock className="w-3 h-3" />
+          )}
+          <span className="ml-1 hidden sm:inline">Pending</span>
+        </button>
+      )}
+
       {/* Mark as Fixed Button */}
       {status !== 'fixed' && status !== 'spam' && (
         <button

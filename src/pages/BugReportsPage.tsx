@@ -47,6 +47,24 @@ const BugReportsPage: React.FC = () => {
     }
   };
 
+  const handleMarkRead = async (id: string) => {
+    const result = await updateBugReportStatus(id, 'read');
+    if (result.error) {
+      alert(`Error: ${result.error.message}`);
+    } else {
+      await refetch();
+    }
+  };
+
+  const handleMarkPending = async (id: string) => {
+    const result = await updateBugReportStatus(id, 'pending');
+    if (result.error) {
+      alert(`Error: ${result.error.message}`);
+    } else {
+      await refetch();
+    }
+  };
+
   const handleDelete = async (id: string) => {
     const result = await deleteBugReport(id);
     if (result.error) {
@@ -101,6 +119,8 @@ const BugReportsPage: React.FC = () => {
             status === 'resolved' ? 'bg-green-100 text-green-800' :
             status === 'fixed' ? 'bg-emerald-100 text-emerald-800' :
             status === 'spam' ? 'bg-red-100 text-red-800' :
+            status === 'read' ? 'bg-indigo-100 text-indigo-800' :
+            status === 'pending' ? 'bg-yellow-200 text-yellow-900' :
             'bg-gray-100 text-gray-800'
           }`}>
             {status.replace('_', ' ').charAt(0).toUpperCase() + status.replace('_', ' ').slice(1)}
@@ -123,6 +143,8 @@ const BugReportsPage: React.FC = () => {
           status={item.status || 'new'}
           onMarkFixed={handleMarkFixed}
           onMarkSpam={handleMarkSpam}
+          onMarkRead={handleMarkRead}
+          onMarkPending={handleMarkPending}
           onDelete={handleDelete}
         />
       ),
