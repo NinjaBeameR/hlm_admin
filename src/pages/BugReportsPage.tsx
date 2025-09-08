@@ -76,8 +76,8 @@ const BugReportsPage: React.FC = () => {
 
   const columns = [
     {
-      key: 'title' as keyof BugReport,
-      label: 'Title',
+      key: 'description' as keyof BugReport,
+      label: 'Description',
       sortable: true,
       render: (value: string) => (
         <div className="max-w-md">
@@ -88,22 +88,10 @@ const BugReportsPage: React.FC = () => {
       ),
     },
     {
-      key: 'severity' as keyof BugReport,
-      label: 'Severity',
+      key: 'app_version' as keyof BugReport,
+      label: 'App Version',
       sortable: true,
-      render: (value: string | undefined) => {
-        const severity = value || 'low';
-        return (
-          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-            severity === 'critical' ? 'bg-red-100 text-red-800' :
-            severity === 'high' ? 'bg-orange-100 text-orange-800' :
-            severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-            'bg-green-100 text-green-800'
-          }`}>
-            {severity.charAt(0).toUpperCase() + severity.slice(1)}
-          </span>
-        );
-      },
+      render: (value: string | undefined) => value || '-',
     },
     {
       key: 'status' as keyof BugReport,
@@ -130,7 +118,7 @@ const BugReportsPage: React.FC = () => {
     },
     {
       key: 'created_at' as keyof BugReport,
-      label: 'Date Created',
+      label: 'Date Submitted',
       sortable: true,
     },
     {
