@@ -239,6 +239,9 @@ const BugReportsPage: React.FC = () => {
           />
         )}
       </div>
+      <div style={{ background: 'yellow', padding: '10px', textAlign: 'center' }}>
+        TEST DEPLOY: If you see this, your code is up to date!
+      </div>
     </div>
   );
 };
