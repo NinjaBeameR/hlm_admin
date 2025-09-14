@@ -10,15 +10,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // Add timestamp to chunk names to prevent caching issues
-        chunkFileNames: `assets/[name].[hash].${Date.now()}.js`,
-        entryFileNames: `assets/[name].[hash].${Date.now()}.js`,
-        assetFileNames: `assets/[name].[hash].${Date.now()}.[ext]`
+        // Add hash to chunk names for cache busting
+        chunkFileNames: `assets/[name].[hash].js`,
+        entryFileNames: `assets/[name].[hash].js`,
+        assetFileNames: `assets/[name].[hash].[ext]`
       }
     }
-  },
-  define: {
-    // Add build timestamp for debugging
-    __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString())
   }
 });
