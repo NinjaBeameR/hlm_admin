@@ -4,8 +4,19 @@ import type { BugReport, Suggestion, DatabaseError, ReportFormData } from '../ty
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+console.log('🔧 Environment Check:', {
+  hasUrl: !!supabaseUrl,
+  hasKey: !!supabaseAnonKey,
+  url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'MISSING',
+  key: supabaseAnonKey ? `${supabaseAnonKey.substring(0, 10)}...` : 'MISSING'
+});
+
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase configuration. Please check your .env file.');
+  const missingVars = [];
+  if (!supabaseUrl) missingVars.push('VITE_SUPABASE_URL');
+  if (!supabaseAnonKey) missingVars.push('VITE_SUPABASE_ANON_KEY');
+  
+  throw new Error(`Missing Supabase configuration: ${missingVars.join(', ')}. Please check your environment variables in your hosting platform (Vercel/Netlify).`);
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

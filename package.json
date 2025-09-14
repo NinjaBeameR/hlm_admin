@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:clean": "rmdir /s /q dist 2>nul & npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
