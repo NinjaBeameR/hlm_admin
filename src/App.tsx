@@ -4,8 +4,20 @@ import ProtectedRoute from './components/ProtectedRoute';
 import PublicReportForm from './components/PublicReportForm';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboard from './pages/AdminDashboard';
+import { useEffect } from 'react';
+
+// Declare the build timestamp global
+declare global {
+  const __BUILD_TIMESTAMP__: string;
+}
 
 function App() {
+  useEffect(() => {
+    // Log build timestamp to help debug deployment issues
+    console.log('🚀 App built at:', typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : new Date().toISOString());
+    console.log('🔄 Current time:', new Date().toISOString());
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
