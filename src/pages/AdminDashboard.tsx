@@ -2,18 +2,23 @@ import React, { useState } from 'react';
 import { Bug, MessageSquare, LogOut, User, Shield, ExternalLink } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import DataTable from '../components/DataTable';
+import ActionButtons from '../components/ActionButtons';
+import EntryDetailsModal from '../components/EntryDetailsModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
 import { useBugReports } from '../hooks/useBugReports';
 import { useSuggestions } from '../hooks/useSuggestions';
 import type { BugReport, Suggestion } from '../types';
+import { supabase } from '../utils/supabase';
 
 type TabType = 'bugs' | 'suggestions';
 
 const AdminDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('bugs');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<BugReport | Suggestion | null>(null);
   
   const { data: bugReports, loading: bugsLoading, error: bugsError, refetch: refetchBugs } = useBugReports();
   const { data: suggestions, loading: suggestionsLoading, error: suggestionsError, refetch: refetchSuggestions } = useSuggestions();
@@ -34,6 +39,48 @@ const AdminDashboard: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  // Action handlers for bug reports
+  const handleMarkFixed = async (id: string) => {
+    await supabase.from('bug_reports').update({ status: 'Fixed' }).eq('id', id);
+    refetchBugs();
+  };
+
+  const handleMarkSpam = async (id: string) => {
+    await supabase.from('bug_reports').update({ status: 'Spam' }).eq('id', id);
+    refetchBugs();
+  };
+
+  const handleMarkRead = async (id: string) => {
+    await supabase.from('bug_reports').update({ status: 'Read' }).eq('id', id);
+    refetchBugs();
+  };
+
+  const handleMarkPending = async (id: string) => {
+    await supabase.from('bug_reports').update({ status: 'Pending' }).eq('id', id);
+    refetchBugs();
+  };
+
+  const handleDelete = async (id: string) => {
+    await supabase.from('bug_reports').delete().eq('id', id);
+    refetchBugs();
+  };
+
+  // Action handlers for suggestions
+  const handleSuggestionMarkRead = async (id: string) => {
+    await supabase.from('suggestions').update({ status: 'Read' }).eq('id', id);
+    refetchSuggestions();
+  };
+
+  const handleSuggestionMarkPending = async (id: string) => {
+    await supabase.from('suggestions').update({ status: 'Pending' }).eq('id', id);
+    refetchSuggestions();
+  };
+
+  const handleSuggestionDelete = async (id: string) => {
+    await supabase.from('suggestions').delete().eq('id', id);
+    refetchSuggestions();
   };
 
   const bugColumns = [
@@ -67,10 +114,45 @@ const AdminDashboard: React.FC = () => {
       render: (value: string) => value || '-',
     },
     {
+      key: 'status' as keyof BugReport,
+      label: 'Status',
+      sortable: true,
+      render: (value: string) => (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          value === 'Fixed' ? 'bg-green-100 text-green-800' :
+          value === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+          value === 'Read' ? 'bg-blue-100 text-blue-800' :
+          value === 'Spam' ? 'bg-red-100 text-red-800' :
+          'bg-gray-100 text-gray-800'
+        }`}>
+          {value || 'New'}
+        </span>
+      ),
+    },
+    {
       key: 'created_at' as keyof BugReport,
       label: 'Date Submitted',
       sortable: true,
       render: (value: string) => formatDate(value),
+    },
+    {
+      key: 'actions' as keyof BugReport,
+      label: 'Actions',
+      render: (value: any, item: BugReport) => (
+        <ActionButtons
+          id={item.id}
+          status={item.status || 'New'}
+          onMarkFixed={handleMarkFixed}
+          onMarkSpam={handleMarkSpam}
+          onMarkRead={handleMarkRead}
+          onMarkPending={handleMarkPending}
+          onDelete={handleDelete}
+          onViewDetails={() => {
+            setSelectedEntry(item);
+            setModalOpen(true);
+          }}
+        />
+      ),
     },
   ];
 
@@ -99,10 +181,43 @@ const AdminDashboard: React.FC = () => {
       ),
     },
     {
+      key: 'status' as keyof Suggestion,
+      label: 'Status',
+      sortable: true,
+      render: (value: string) => (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          value === 'Read' ? 'bg-blue-100 text-blue-800' :
+          value === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+          'bg-gray-100 text-gray-800'
+        }`}>
+          {value || 'New'}
+        </span>
+      ),
+    },
+    {
       key: 'created_at' as keyof Suggestion,
       label: 'Date Submitted',
       sortable: true,
       render: (value: string) => formatDate(value),
+    },
+    {
+      key: 'actions' as keyof Suggestion,
+      label: 'Actions',
+      render: (value: any, item: Suggestion) => (
+        <ActionButtons
+          id={item.id}
+          status={item.status || 'New'}
+          onMarkFixed={() => Promise.resolve()} // Not applicable for suggestions
+          onMarkSpam={() => Promise.resolve()} // Not applicable for suggestions
+          onMarkRead={handleSuggestionMarkRead}
+          onMarkPending={handleSuggestionMarkPending}
+          onDelete={handleSuggestionDelete}
+          onViewDetails={() => {
+            setSelectedEntry(item);
+            setModalOpen(true);
+          }}
+        />
+      ),
     },
   ];
 
@@ -252,6 +367,15 @@ const AdminDashboard: React.FC = () => {
           {renderContent()}
         </div>
       </div>
+
+      {/* Entry Details Modal */}
+      {modalOpen && selectedEntry && (
+        <EntryDetailsModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          entry={selectedEntry}
+        />
+      )}
     </div>
   );
 };
