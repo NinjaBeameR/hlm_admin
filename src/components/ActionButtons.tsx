@@ -9,6 +9,7 @@ interface ActionButtonsProps {
   onMarkRead: (id: string) => Promise<void>;
   onMarkPending: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
+  onViewDetails?: () => void; // Add to interface
 }
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({
@@ -19,6 +20,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   onMarkRead,
   onMarkPending,
   onDelete,
+  onViewDetails,
 }) => {
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -55,7 +57,16 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           <span className="ml-1 hidden sm:inline">Read</span>
         </button>
       )}
-
+      {/* View Button */}
+      {onViewDetails && (
+        <button
+          onClick={onViewDetails}
+          className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200"
+          title="View Details"
+        >
+          <span className="ml-1">View</span>
+        </button>
+      )}
       {/* Mark as Pending Button */}
       {status !== 'pending' && status !== 'fixed' && status !== 'spam' && (
         <button

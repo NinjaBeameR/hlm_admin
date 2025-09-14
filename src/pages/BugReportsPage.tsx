@@ -5,6 +5,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
 import ActionButtons from '../components/ActionButtons';
+import EntryDetailsModal from '../components/EntryDetailsModal';
 import { useBugReports } from '../hooks/useBugReports';
 import { updateBugReportStatus, deleteBugReport } from '../utils/supabase';
 import type { BugReport } from '../types';
@@ -14,6 +15,8 @@ type FilterType = 'all' | 'active' | 'fixed' | 'spam';
 const BugReportsPage: React.FC = () => {
   const { data, loading, error, refetch } = useBugReports();
   const [filter, setFilter] = useState<FilterType>('active');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<BugReport | null>(null);
 
   // Filter data based on current filter
   const filteredData = useMemo(() => {
@@ -134,6 +137,10 @@ const BugReportsPage: React.FC = () => {
           onMarkRead={handleMarkRead}
           onMarkPending={handleMarkPending}
           onDelete={handleDelete}
+          onViewDetails={() => {
+            setSelectedEntry(item);
+            setModalOpen(true);
+          }}
         />
       ),
     },
@@ -220,6 +227,15 @@ const BugReportsPage: React.FC = () => {
             data={filteredData}
             columns={columns}
             emptyMessage={`No ${filter} bug reports found`}
+          />
+        )}
+
+        {/* Entry Details Modal */}
+        {selectedEntry && (
+          <EntryDetailsModal
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+            entry={selectedEntry || { description: '', created_at: '' }}
           />
         )}
       </div>

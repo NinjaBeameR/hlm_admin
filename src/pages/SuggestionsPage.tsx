@@ -5,12 +5,15 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
 import SuggestionActionButtons from '../components/SuggestionActionButtons';
+import EntryDetailsModal from '../components/EntryDetailsModal';
 import { useSuggestions } from '../hooks/useSuggestions';
 import { deleteSuggestion, updateSuggestionStatus } from '../utils/supabase';
 import type { Suggestion } from '../types';
 
 const SuggestionsPage: React.FC = () => {
   const { data, loading, error, refetch } = useSuggestions();
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [selectedEntry, setSelectedEntry] = React.useState<Suggestion | null>(null);
 
   const handleDelete = async (id: string) => {
     const result = await deleteSuggestion(id);
@@ -37,6 +40,16 @@ const SuggestionsPage: React.FC = () => {
     } else {
       await refetch();
     }
+  };
+
+  const handleOpenModal = (item: Suggestion) => {
+    setSelectedEntry(item);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedEntry(null);
+    setModalOpen(false);
   };
 
   const columns = [
@@ -86,6 +99,7 @@ const SuggestionsPage: React.FC = () => {
           onMarkRead={handleMarkRead}
           onMarkPending={handleMarkPending}
           onDelete={handleDelete}
+          onViewDetails={() => handleOpenModal(item)}
         />
       ),
     },
@@ -136,6 +150,14 @@ const SuggestionsPage: React.FC = () => {
             data={data}
             columns={columns}
             emptyMessage="No suggestions found"
+          />
+        )}
+
+        {selectedEntry && (
+          <EntryDetailsModal
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+            entry={selectedEntry || { description: '', created_at: '' }}
           />
         )}
       </div>
